@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Корзина - ТехноМания</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .contain {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      max-width: 800px;
+      margin: 40px auto;
+    }
+    .contain h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #222;
+    }
+    .cart-item {
+      display: flex;
+      gap: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #fafafa;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .cart-item img {
+      width: 80px;
+      height: auto;
+      border-radius: 4px;
+    }
+    .item-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .item-details h2 {
+      font-size: 20px;
+      margin: 0;
+      color: #333;
+    }
+    .quantity {
+      width: 60px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .price {
+      font-size: 18px;
+      font-weight: 600;
+      color: #007bff;
+    }
+    .remove-btn {
+      align-self: flex-start;
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .remove-btn:hover {
+      background: #c0392b;
+    }
+    .total-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 30px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+    .total {
+      font-size: 22px;
+      font-weight: 700;
+      color: #222;
+    }
+    .promo-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .promo-container input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .promo-container button {
+      padding: 8px 16px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .promo-container button:hover {
+      background: #0056b3;
+    }
+    .checkout-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #28a745;
+      color: #fff;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    .checkout-btn:hover {
+      background: #218838;
+    }
+    @media (max-width: 576px) {
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .promo-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <ul>
+          <div class="logo">
+            <a href="index.html" class="logo">
+              <img src="img/logo.png" alt="Логотип" />
+            </a>
+          </div>
+          <li><a href="kataloh.html">Каталог</a></li>
+          <div class="search-bar">
+            <input type="text" placeholder="Поиск...">
+          </div>
+          <li><a href="korzina.html">Корзина (<span id="cart-count">0</span>)</a></li>
+          <li><a href="lich.html">Личный Кабинет</a></li>
+        </ul>
+      </nav>
+      <div class="menu-toggle" id="mobile-menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </header>
+  <br><br><br><br>
+  <main>
+  <div class="contain">
+    <h1>Ваша корзина</h1>
+    <!-- Контейнер, куда будут загружаться товары -->
+    <div class="contain">
+
+  
+      <div id="cartContainer"></div>
+  
+      <div class="total-container">
+        <div>
+          <div class="total" id="totalAmount">Итого: 0 руб.</div>
+          <div class="promo-container">
+            <input type="text" id="promoCode" placeholder="Введите промокод">
+            <button id="applyPromo">Применить</button>
+          </div>
+        </div>
+        <a href="oform.html" class="checkout-btn">Оформить заказ</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    
+  // Обновление счётчика в шапке (сумма всех quantity)
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const totalCount = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+    document.getElementById('cart-count').textContent = totalCount;
+  }
+
+  // Добавляет товар в корзину, аккумулируя количество
+  function addToCart(id, name, price, image) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const existing = cart.find(item => item.id === id);
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      cart.push({ id, name, price, image, quantity: 1 });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    alert(`В корзине теперь ${existing ? existing.quantity : 1} шт. «${name}»`);
+  }
+
+  // Создаёт HTML для одного товара, используя его quantity
+  function createCartItem(item) {
+    return `
+      <div class="cart-item" data-id="${item.id}">
+        <img src="${item.image}" alt="${item.name}">
+        <div class="item-details">
+          <h2>${item.name}</h2>
+          <label>
+            Количество:
+            <input type="number" class="quantity" value="${item.quantity}" min="1">
+          </label>
+          <span class="price" data-price="${item.price}">
+            Цена: ${item.price} руб.
+          </span>
+          <button class="remove-btn">Удалить</button>
+        </div>
+      </div>
+    `;
+  }
+
+  let promoApplied = false;
+
+  // Пересчитывает итоговую сумму и сохраняет обновлённые quantity
+  function updateTotal() {
+    let total = 0;
+    const cart = [];
+
+    document.querySelectorAll('.cart-item').forEach(itemEl => {
+      const id = itemEl.getAttribute('data-id');
+      const price = parseFloat(itemEl.querySelector('.price').dataset.price);
+      const qtyInput = itemEl.querySelector('.quantity');
+      const qty = Math.max(1, parseInt(qtyInput.value, 10));
+      total += price * qty;
+      cart.push({
+        id,
+        // Дополнительно подгружаем name и image из DOM, если нужно
+        name: itemEl.querySelector('h2').textContent,
+        image: itemEl.querySelector('img').src,
+        price,
+        quantity: qty
+      });
+    });
+
+    // Сохраняем новые количества в localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+
+    if (promoApplied) total *= 0.9;
+    document.getElementById('totalAmount').textContent =
+      'Итого: ' + total.toFixed(2) + ' руб.';
+  }
+
+  // Удалить товар из DOM и из localStorage
+  function attachRemoveEvent(button) {
+    button.addEventListener('click', () => {
+      const itemEl = button.closest('.cart-item');
+      const id = itemEl.getAttribute('data-id');
+      itemEl.remove();
+
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart = cart.filter(item => item.id !== id);
+      localStorage.setItem('cart', JSON.stringify(cart));
+
+      updateTotal();
+    });
+  }
+
+  // Загрузка корзины и навешивание всех событий
+  function loadCart() {
+    const container = document.getElementById('cartContainer');
+    container.innerHTML = '';
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    if (!cart.length) {
+      container.innerHTML = '<p>Ваша корзина пуста.</p>';
+      updateCartCount();
+      return;
+    }
+
+    cart.forEach(item => {
+      container.insertAdjacentHTML('beforeend', createCartItem(item));
+    });
+
+    // Навешиваем события
+    container.querySelectorAll('.remove-btn').forEach(attachRemoveEvent);
+    container.querySelectorAll('.quantity').forEach(input => {
+      input.addEventListener('change', updateTotal);
+    });
+
+    updateTotal();
+  }
+
+  // Применение промокода
+  document.getElementById('applyPromo').addEventListener('click', () => {
+    const code = document.getElementById('promoCode').value.trim().toUpperCase();
+    if (code === 'ККРИТ' && !promoApplied) {
+      promoApplied = true;
+      updateTotal();
+      alert('Промокод успешно применен! Скидка 10%.');
+      document.getElementById('applyPromo').disabled = true;
+    } else if (promoApplied) {
+      alert('Промокод уже применен.');
+    } else {
+      alert('Неверный промокод.');
+    }
+  });
+
+  // При загрузке страницы
+  document.addEventListener('DOMContentLoaded', () => {
+    loadCart();
+    updateCartCount();
+  });
+  </script>
+
+  <br><br><br><br><br><br><br><br><br><br><br><br>
+  <footer>
+    <div class="footer-container">
+      <!-- Лого и навигация -->
+      <div class="footer-section nav">
+        <a href="index.html" class="footer-logo">
+          <img src="img/logo.png" alt="Логотип" />
+        </a>
+        <ul class="footer-nav">
+          <li><a href="index.html">Главная</a></li>
+          <li><a href="about.html">О нас</a></li>
+          <li><a href="contacts.html">Контакты</a></li>
+        </ul>
+      </div>
+
+      <!-- Контактная информация -->
+      <div class="footer-section contact">
+        <h3>Контактная информация</h3>
+        <p>Телефон: <a href="tel:+73917594242">+7 (391) 759‑42‑42</a></p>
+        <p>Email: <a href="mailto:barhatovo@mail.ru">barhatovo@mail.ru</a></p>
+      </div>
+
+      <!-- Социальные сети -->
+      <div class="footer-section social">
+        <h3>Следите за нами</h3>
+        <div class="social-icons">
+          <a href="https://web.telegram.org/" target="_blank">
+            <img src="img/1683044996telegram-logo-png.png" alt="tg">
+          </a>
+          <a href="https://vk.com/" target="_blank">
+            <img src="img/pngwing.com.png" alt="Vk">
+          </a>
+        </div>
+      </div>
+
+      <!-- Копирайт -->
+      <div class="footer-section copyright">
+        <p>&copy; © 2025 ТехноМания. Все права защищены.</p>
+      </div>
+    </div>
+  </footer>
+  <!-- ========== /НОВЫЙ ФУТЕР ========== -->
+
+  <style>
+    /* FOOTER */
+    footer {
+      background: linear-gradient(200deg, #333, #555);
+      color: #fff;
+      padding: 40px 20px;
+      font-family: Arial, sans-serif;
+    }
+    .footer-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-section {
+      flex: 1 1 250px;
+      margin: 10px;
+    }
+    .footer-section.nav .footer-logo img {
+      max-height: 50px;
+      margin-bottom: 15px;
+    }
+    .footer-nav {
+      list-style: none;
+      padding: 0;
+    }
+    .footer-nav li {
+      margin: 5px 0;
+    }
+    .footer-nav a {
+      color: #fff;
+      text-decoration: none;
+      transition: color .3s;
+    }
+    .footer-nav a:hover {
+      color: #0af;
+    }
+    .footer-section h3 {
+      margin-bottom: 15px;
+      font-size: 1.2em;
+      border-bottom: 2px solid #0af;
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+    .footer-section a {
+      color: #0af;
+      text-decoration: none;
+    }
+    .footer-section a:hover {
+      text-decoration: underline;
+    }
+    .social-icons {
+      margin-top: 10px;
+    }
+    .social-icons a {
+      margin-right: 10px;
+      display: inline-block;
+    }
+    .social-icons img {
+      width: 36px;
+      transition: transform .3s;
+    }
+    .social-icons img:hover {
+      transform: scale(1.1);
+    }
+    .footer-section.copyright {
+      align-self: flex-end;
+      text-align: right;
+    }
+    @media (max-width: 768px) {
+      .footer-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-section {
+        margin: 15px 0;
+      }
+      .footer-nav li {
+        display: inline-block;
+        margin: 0 10px;
+      }
+    }
+  </style>
+
+  
+  <script>
+    // Логика слайдера
+    let slideIndex = 0;
+    const slidesContainer = document.querySelector('.slides');
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+      if (index >= totalSlides) {
+        slideIndex = 0;
+      } else if (index < 0) {
+        slideIndex = totalSlides - 1;
+      } else {
+        slideIndex = index;
+      }
+      slidesContainer.style.transform = 'translateX(' + (-slideIndex * 100) + '%)';
+    }
+
+    function nextSlide() {
+      showSlide(slideIndex + 1);
+    }
+
+    function prevSlide() {
+      showSlide(slideIndex - 1);
+    }
+    
+    // Функция добавления товара в корзину
+    function addToCart() {
+      // Здесь можно реализовать отправку данных на сервер или сохранение в localStorage
+      alert("Товар добавлен в корзину!");
+    }
+    
+    // При желании можно добавить автопереключение слайдов:
+    // setInterval(nextSlide, 5000);
+  </script>
+</body>
+</html>

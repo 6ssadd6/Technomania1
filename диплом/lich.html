@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ТехноМания</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Общие стили для форм авторизации */
+    .auth-container {
+      max-width: 400px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      background-color: #fff;
+    }
+    .auth-container h2 {
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 15px;
+      position: relative;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    .auth-container button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      border: none;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .auth-container p {
+      text-align: center;
+    }
+    .auth-container a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    /* Стили для шапки */
+    header {
+      background-color: #484848;
+      padding: 15px 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    header .container nav ul {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    header .container nav ul li {
+      margin: 0 10px;
+    }
+    
+    /* Стили для личного кабинета (кабинета в стиле Wildberries) */
+    .cabinet {
+      display: flex;
+      max-width: 1200px;
+      margin: 40px auto;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    /* Левая навигационная панель */
+    .cabinet-sidebar {
+      width: 250px;
+      border-right: 1px solid #ddd;
+      background-color: #fefefe;
+    }
+    .cabinet-sidebar ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .cabinet-sidebar li {
+      border-bottom: 1px solid #ddd;
+    }
+    .cabinet-sidebar li a {
+      display: block;
+      padding: 15px 20px;
+      text-decoration: none;
+      color: #333;
+      transition: background-color 0.3s;
+    }
+    .cabinet-sidebar li a:hover,
+    .cabinet-sidebar li a.active {
+      background-color: #e5e5e5;
+    }
+    /* Основное содержимое кабинета */
+    .cabinet-content {
+      flex: 1;
+      padding: 20px;
+    }
+    .cabinet-content h2 {
+      margin-top: 0;
+    }
+    /* Стили для формы профиля в разделе "Профиль" */
+    .profile-form {
+      max-width: 600px;
+      background-color: #fff;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    .profile-form .form-group {
+      margin-bottom: 15px;
+    }
+    .profile-form label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .profile-form input[type="text"],
+    .profile-form input[type="email"],
+    .profile-form input[type="tel"],
+    .profile-form input[type="date"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .profile-form button {
+      padding: 10px 20px;
+      background-color: #0071dc;
+      border: none;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .profile-form button:hover {
+      background-color: #005bb5;
+    }
+    /* Стили для раздела "Избранное" */
+    .favorites-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .favorite-item {
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 4px;
+      background-color: #fff;
+      text-align: center;
+    }
+    .favorite-item img {
+      max-width: 100%;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .delete-favorite {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #ff0000;
+      transition: color 0.3s;
+    }
+    .delete-favorite:hover {
+      color: #cc0000;
+    }
+    /* Стили для переключателя видимости пароля (используются и в формах авторизации) */
+    .pwd-toggle-icon {
+      position: absolute;
+      right: 10px;
+      top: 70%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      outline: none;
+    }
+    .pwd-toggle-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: #007bff;
+      transition: fill 0.3s;
+    }
+    .pwd-toggle-icon:hover svg {
+      fill: #0056b3;
+    }
+    /* Адаптивные стили */
+    @media(max-width: 768px) {
+      .cabinet {
+        flex-direction: column;
+      }
+      .cabinet-sidebar {
+        width: 100%;
+      }
+    }
+   
+  </style>
+</head>
+<body>
+
+  <!-- Шапка остается без изменений -->
+  <header>
+    <div class="container">
+      <nav>
+        <ul>
+          <li class="logo">
+            <a href="index.html">
+              <img src="img/logo.png" alt="Логотип">
+            </a>
+          </li>
+          <li><a href="kataloh.html">Каталог</a></li>
+          <li class="search-bar">
+            <input type="text" placeholder="Поиск...">
+          </li>
+          <li><a href="korzina.html">Корзина (<span id="cart-count">0</span>)</a></li>
+          <li><a href="lich.html">Личный Кабинет</a></li>
+        </ul>
+      </nav>
+      <div class="menu-toggle" id="mobile-menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
+  </header>
+  <main>
+    <!-- Форма авторизации и регистрации (до входа в кабинет) -->
+    <div class="auth-container" id="auth-container">
+      <!-- Форма входа -->
+      <div class="login-form">
+        <h2>Вход в аккаунт</h2>
+        <form id="login" method="post" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="password" required>
+            <a type="button" class="pwd-toggle-icon" onclick="togglePwdVisibility('password', this)">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 4.5C7.305 4.5 3.168 7.364 1.5 12c1.668 4.636 5.805 7.5 10.5 7.5s8.832-2.864 10.5-7.5c-1.668-4.636-5.805-7.5-10.5-7.5zm0 13c-3.038 0-5.5-2.462-5.5-5.5S8.962 6.5 12 6.5s5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5z"/>
+                <circle cx="12" cy="12" r="2.5"/>
+              </svg>
+            </a>
+          </div>
+          <button type="submit">Войти</button>
+          <p>Нет аккаунта? <a href="#" id="show-register-link">Зарегистрироваться</a></p>
+        </form>
+      </div>
+      <!-- Форма регистрации -->
+      <div class="register-form" style="display: none;">
+        <h2>Создание аккаунта</h2>
+        <form id="register" method="post">
+          <div class="form-group">
+            <label for="reg-email">Email:</label>
+            <input type="email" id="reg-email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="full-name">ФИО:</label>
+            <input type="text" id="full-name" name="full-name" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Номер телефона:</label>
+            <input type="tel" id="phone" name="phone" required>
+          </div>
+          <div class="form-group">
+            <label for="dob">Дата рождения:</label>
+            <input type="date" id="dob" name="dob" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Пароль:</label>
+            <input type="password" id="reg-password" name="password" required>
+            <a type="button" class="pwd-toggle-icon" onclick="togglePwdVisibility('reg-password', this)">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 4.5C7.305 4.5 3.168 7.364 1.5 12c1.668 4.636 5.805 7.5 10.5 7.5s8.832-2.864 10.5-7.5c-1.668-4.636-5.805-7.5-10.5-7.5zm0 13c-3.038 0-5.5-2.462-5.5-5.5S8.962 6.5 12 6.5s5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5z"/>
+                <circle cx="12" cy="12" r="2.5"/>
+              </svg>
+            </a>
+          </div>
+          <button type="submit">Зарегистрироваться</button>
+          <p>Уже есть аккаунт? <a href="#" id="show-login-link">Войти</a></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Личный кабинет в стиле Wildberries (отображается после авторизации) -->
+    <div class="cabinet" id="cabinet" style="display: none;">
+      <!-- Левая навигационная панель -->
+      <aside class="cabinet-sidebar">
+        <ul>
+          <li><a href="#profile" class="active" onclick="showSection('profile')">Профиль</a></li>
+          <li><a href="#favorites" onclick="showSection('favorites')">Избранное</a></li>
+          <!-- Дополнительные пункты можно добавить здесь -->
+        </ul>
+      </aside>
+      <!-- Основное содержимое кабинета -->
+      <main class="cabinet-content">
+        <!-- Секция "Профиль" -->
+        <section id="profile" class="section">
+          <h2>Профиль</h2>
+          <div class="profile-form">
+            <div class="form-group">
+              <label for="profile-name">ФИО:</label>
+              <input type="text" id="profile-name" placeholder="Ваше ФИО" readonly>
+            </div>
+            <div class="form-group">
+              <label for="profile-email">Email:</label>
+              <input type="email" id="profile-email" placeholder="Ваш email" readonly>
+            </div>
+            <div class="form-group">
+              <label for="profile-phone">Телефон:</label>
+              <input type="tel" id="profile-phone" placeholder="Ваш телефон" readonly>
+            </div>
+            <div class="form-group">
+              <label for="profile-dob">Дата рождения:</label>
+              <input type="date" id="profile-dob" readonly>
+            </div>
+            <button id="logout">Выйти</button>
+          </div>
+          <!-- Кнопка редактирования и форма редактирования профиля -->
+          <button id="edit-button">Редактировать данные</button>
+          <div id="edit-form" class="profile-form" style="display: none;">
+            <h3>Изменить данные</h3>
+            <form id="update-form">
+              <div class="form-group">
+                <label for="edit-email">Email:</label>
+                <input type="email" id="edit-email" required>
+              </div>
+              <div class="form-group">
+                <label for="edit-phone">Телефон:</label>
+                <input type="tel" id="edit-phone" required>
+              </div>
+              <div class="form-group">
+                <label for="edit-password">Новый пароль:</label>
+                <input type="password" id="edit-password">
+              </div>
+              <button type="submit">Сохранить изменения</button>
+              <button type="button" id="cancel-edit">Отмена</button>
+            </form>
+          </div>
+        </section>
+        <!-- Секция "Избранное" -->
+        <section id="favorites" class="section" style="display: none;">
+          <h2>Избранное</h2>
+          <div class="favorites-grid" id="favorites-list">
+            <br><br>  <br><br>  <br><br>  <br><br>
+            <!-- Динамически добавляемые избранные товары -->
+          </div>
+        </section>
+        
+      </main>
+    </div>
+  </main>
+
+  <script>
+      // Обновление счётчика в шапке
+      function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      document.getElementById('cart-count').textContent = cart.length;
+    }
+    // Переключение между формами авторизации
+    document.getElementById('show-register-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelector('.login-form').style.display = 'none';
+      document.querySelector('.register-form').style.display = 'block';
+    });
+    document.getElementById('show-login-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelector('.register-form').style.display = 'none';
+      document.querySelector('.login-form').style.display = 'block';
+    });
+
+    // Функция для обработки логина
+    function handleLogin(event) {
+      event.preventDefault();
+      showCabinetFromLocalStorage();
+    }
+
+    // Обработка регистрации
+    document.getElementById('register').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('reg-email').value;
+      const fullName = document.getElementById('full-name').value;
+      const phone = document.getElementById('phone').value;
+      const dob = document.getElementById('dob').value;
+      const password = document.getElementById('reg-password').value;
+      const userData = { email, fullName, phone, dob, password };
+      localStorage.setItem('userData', JSON.stringify(userData));
+      showCabinetFromLocalStorage();
+    });
+
+    // Отображение кабинета из localStorage
+    function showCabinetFromLocalStorage() {
+      const storedData = localStorage.getItem('userData');
+      if (storedData) {
+        const { email, fullName, phone, dob } = JSON.parse(storedData);
+        document.getElementById('profile-name').value = fullName;
+        document.getElementById('profile-email').value = email;
+        document.getElementById('profile-phone').value = phone;
+        document.getElementById('profile-dob').value = dob;
+        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('cabinet').style.display = 'flex';
+        showSection('profile');
+      } else {
+        alert("Аккаунт не найден. Пожалуйста, зарегистрируйтесь.");
+      }
+    }
+
+    // Отображение избранных товаров
+    function showFavorites() {
+      const favoritesList = document.getElementById("favorites-list");
+      const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      if (favorites.length === 0) {
+        favoritesList.innerHTML = "<p>Нет избранных товаров.</p>";
+        return;
+      }
+      favoritesList.innerHTML = "";
+      favorites.forEach(item => {
+        const favoriteDiv = document.createElement("div");
+        favoriteDiv.classList.add("favorite-item");
+        favoriteDiv.innerHTML = `
+          <img src="${item.image}" alt="${item.name}" width="60">
+          <div>
+            <p>${item.name}</p>
+            <p>Цена: ${item.price} ₽</p>
+          </div>
+          <button class="delete-favorite" data-id="${item.id}">✖</button>
+        `;
+        favoritesList.appendChild(favoriteDiv);
+      });
+      document.querySelectorAll('.delete-favorite').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const id = btn.getAttribute('data-id');
+          removeFavorite(id);
+        });
+      });
+    }
+
+    // Удаление избранного товара
+    function removeFavorite(id) {
+      let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      favorites = favorites.filter(item => item.id != id);
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      showFavorites();
+    }
+
+    // Выход из кабинета
+    document.getElementById('logout').addEventListener('click', function() {
+      localStorage.removeItem('userData');
+      document.getElementById('cabinet').style.display = 'none';
+      document.getElementById('auth-container').style.display = 'block';
+    });
+
+    // Ограничения ввода для ФИО и телефона
+    document.getElementById('full-name').addEventListener('input', function() {
+      this.value = this.value.replace(/\d/g, '');
+    });
+    document.getElementById('phone').addEventListener('input', function() {
+      this.value = this.value.replace(/[^\d]/g, '');
+    });
+    document.getElementById('dob').max = new Date().toISOString().split("T")[0];
+      // Ввод телефона: + +11 цифр
+    function formatPhone(el){ let d = el.value.replace(/\D/g,'').slice(0,11); el.value = d ? '+'+d : ''; }
+    document.getElementById('phone').addEventListener('input', function(){ formatPhone(this); });
+
+    // Переключение видимости пароля
+    function togglePwdVisibility(fieldId, toggleBtn) {
+      const field = document.getElementById(fieldId);
+      if (field.type === "password") {
+        field.type = "text";
+        toggleBtn.innerHTML = `<svg viewBox="0 0 24 24">
+          <path d="M12 4.5C7.305 4.5 3.168 7.364 1.5 12c1.668 4.636 5.805 7.5 10.5 7.5s8.832-2.864 10.5-7.5c-1.668-4.636-5.805-7.5-10.5-7.5zm0 13c-3.038 0-5.5-2.462-5.5-5.5S8.962 6.5 12 6.5s5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5z"/>
+          <circle cx="12" cy="12" r="2.5"/>
+        </svg>`;
+      } else {
+        field.type = "password";
+        toggleBtn.innerHTML = `<svg viewBox="0 0 24 24">
+          <path d="M12 4.5C7.305 4.5 3.168 7.364 1.5 12c1.668 4.636 5.805 7.5 10.5 7.5 4.695 0 8.832-2.864 10.5-7.5-1.668-4.636-5.805-7.5-10.5-7.5zm0 13c-3.038 0-5.5-2.462-5.5-5.5S8.962 6.5 12 6.5s5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5z"/>
+          <path d="M12 8a4 4 0 0 0 0 8 4 4 0 0 0 0-8z"/>
+        </svg>`;
+      }
+    }
+
+    // Редактирование данных профиля
+    document.getElementById('edit-button').addEventListener('click', function() {
+      const storedData = JSON.parse(localStorage.getItem('userData'));
+      if (storedData) {
+        document.getElementById('edit-email').value = storedData.email;
+        document.getElementById('edit-phone').value = storedData.phone;
+      }
+      document.getElementById('edit-form').style.display = 'block';
+    });
+    document.getElementById('cancel-edit').addEventListener('click', function() {
+      document.getElementById('edit-form').style.display = 'none';
+    });
+    document.getElementById('update-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const newEmail = document.getElementById('edit-email').value;
+      const newPhone = document.getElementById('edit-phone').value;
+      const newPassword = document.getElementById('edit-password').value;
+      let storedData = JSON.parse(localStorage.getItem('userData'));
+      storedData.email = newEmail;
+      storedData.phone = newPhone;
+      if(newPassword.trim() !== "") {
+        storedData.password = newPassword;
+      }
+      localStorage.setItem('userData', JSON.stringify(storedData));
+      document.getElementById('profile-email').value = newEmail;
+      document.getElementById('profile-phone').value = newPhone;
+      document.getElementById('edit-form').style.display = 'none';
+      alert("Данные обновлены!");
+    });
+
+    // Переключение секций кабинета
+    function showSection(sectionId) {
+      const sections = document.querySelectorAll('.section');
+      sections.forEach(section => {
+        section.style.display = section.id === sectionId ? 'block' : 'none';
+      });
+      const links = document.querySelectorAll('.cabinet-sidebar a');
+      links.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + sectionId);
+      });
+      if (sectionId === 'favorites') {
+        showFavorites();
+      }
+    }
+
+    // Проверка авторизации при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('dob').max = new Date().toISOString().split("T")[0];
+      if(localStorage.getItem('userData')) {
+        showCabinetFromLocalStorage();
+      }
+    });
+  </script>
+  
+  <!-- Подвал остается без изменений -->
+  <footer>
+    <div class="footer-container">
+      <!-- Лого и навигация -->
+      <div class="footer-section nav">
+        <a href="index.html" class="footer-logo">
+          <img src="img/logo.png" alt="Логотип" />
+        </a>
+        <ul class="footer-nav">
+          <li><a href="index.html">Главная</a></li>
+          <li><a href="about.html">О нас</a></li>
+          <li><a href="contacts.html">Контакты</a></li>
+        </ul>
+      </div>
+
+      <!-- Контактная информация -->
+      <div class="footer-section contact">
+        <h3>Контактная информация</h3>
+        <p>Телефон: <a href="tel:+73917594242">+7 (391) 759‑42‑42</a></p>
+        <p>Email: <a href="mailto:barhatovo@mail.ru">barhatovo@mail.ru</a></p>
+      </div>
+
+      <!-- Социальные сети -->
+      <div class="footer-section social">
+        <h3>Следите за нами</h3>
+        <div class="social-icons">
+          <a href="https://web.telegram.org/" target="_blank">
+            <img src="img/1683044996telegram-logo-png.png" alt="tg">
+          </a>
+          <a href="https://vk.com/" target="_blank">
+            <img src="img/pngwing.com.png" alt="Vk">
+          </a>
+        </div>
+      </div>
+
+      <!-- Копирайт -->
+      <div class="footer-section copyright">
+        <p>&copy; © 2025 ТехноМания. Все права защищены.</p>
+      </div>
+    </div>
+  </footer>
+  <!-- ========== /НОВЫЙ ФУТЕР ========== -->
+
+  <style>
+    /* FOOTER */
+    footer {
+      background: linear-gradient(200deg, #333, #555);
+      color: #fff;
+      padding: 40px 20px;
+      font-family: Arial, sans-serif;
+    }
+    .footer-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-section {
+      flex: 1 1 250px;
+      margin: 10px;
+    }
+    .footer-section.nav .footer-logo img {
+      max-height: 50px;
+      margin-bottom: 15px;
+    }
+    .footer-nav {
+      list-style: none;
+      padding: 0;
+    }
+    .footer-nav li {
+      margin: 5px 0;
+    }
+    .footer-nav a {
+      color: #fff;
+      text-decoration: none;
+      transition: color .3s;
+    }
+    .footer-nav a:hover {
+      color: #0af;
+    }
+    .footer-section h3 {
+      margin-bottom: 15px;
+      font-size: 1.2em;
+      border-bottom: 2px solid #0af;
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+    .footer-section a {
+      color: #0af;
+      text-decoration: none;
+    }
+    .footer-section a:hover {
+      text-decoration: underline;
+    }
+    .social-icons {
+      margin-top: 10px;
+    }
+    .social-icons a {
+      margin-right: 10px;
+      display: inline-block;
+    }
+    .social-icons img {
+      width: 36px;
+      transition: transform .3s;
+    }
+    .social-icons img:hover {
+      transform: scale(1.1);
+    }
+    .footer-section.copyright {
+      align-self: flex-end;
+      text-align: right;
+    }
+    @media (max-width: 768px) {
+      .footer-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-section {
+        margin: 15px 0;
+      }
+      .footer-nav li {
+        display: inline-block;
+        margin: 0 10px;
+      }
+    }
+  </style>
+
+  
+  <script>
+    // Логика слайдера
+    let slideIndex = 0;
+    const slidesContainer = document.querySelector('.slides');
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+      if (index >= totalSlides) {
+        slideIndex = 0;
+      } else if (index < 0) {
+        slideIndex = totalSlides - 1;
+      } else {
+        slideIndex = index;
+      }
+      slidesContainer.style.transform = 'translateX(' + (-slideIndex * 100) + '%)';
+    }
+
+    function nextSlide() {
+      showSlide(slideIndex + 1);
+    }
+
+    function prevSlide() {
+      showSlide(slideIndex - 1);
+    }
+    
+    // Функция добавления товара в корзину
+    function addToCart() {
+      // Здесь можно реализовать отправку данных на сервер или сохранение в localStorage
+      alert("Товар добавлен в корзину!");
+    }
+    
+    // При желании можно добавить автопереключение слайдов:
+    // setInterval(nextSlide, 5000);
+  </script>
+</body>
+</html>

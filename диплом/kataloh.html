@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ТехноМания</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Основной контент */
+    main {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+    
+    .sort-controls {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sort-controls label {
+      font-size: 16px;
+    }
+    .sort-controls select {
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    /* Контейнер с категориями и товарами */
+    .content-container {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    /* Сайдбар с категориями */
+    .category-sidebar {
+      flex: 0 0 200px;
+      padding: 15px;
+      border-radius: 4px;
+    }
+    .category-sidebar h3 {
+      margin-bottom: 15px;
+      font-size: 20px;
+      text-align: center;
+    }
+    .category-sidebar button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #484848;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .category-sidebar button:hover {
+      background-color: #0056b3;
+    }
+    /* Секция товаров */
+    .product-section {
+      flex: 1;
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .product-list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr); /* 4 товара в ряд */
+      gap: 20px;
+    }
+    .product {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 20px;
+      background-color: #fafafa;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .product:hover { transform: translateY(-5px); }
+    .product img { max-width: 100%; height: auto; margin-bottom: 10px; }
+    .product h2 { font-size: 18px; margin: 10px 0; overflow: hidden; }
+    .product p { font-size: 14px; margin-bottom: 10px; overflow: hidden; }
+    .product .price { font-size: 16px; font-weight: bold; color: #007bff; }
+    .product-buttons { display: inline-flex; align-items: center; gap: 10px; }
+
+    /* Стили для кнопок */
+    .buy-btn,
+    .favorite-btn {
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .buy-btn {
+      background-color: #484848;
+      color: #fff;
+    }
+    .buy-btn:hover {
+      background-color: #383838;
+    }
+    .favorite-btn {
+      font-size: 24px;
+      color: #ccc;
+      background: none;
+      transition: color 0.3s ease;
+    }
+    .favorite-btn.active {
+      color: red;
+    }
+  
+ 
+    .content-container { display: flex; gap: 20px; align-items: flex-start; }
+    .sidebar { flex: 0 0 250px; background: #fff; padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; position: sticky; top: 20px; }
+    .product-section { flex: 1; background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+    .product-list { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
+    .product {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 20px;
+      background-color: #fafafa;
+      text-align: center;
+      transition: transform .3s ease;
+    }
+    .product:hover { transform: translateY(-5px); }
+    .product img { width: 100%; height: auto; margin-bottom: 10px; }
+    .product h2 { font-size: 1.1rem; margin: 10px 0; }
+    .product p { font-size: .9rem; margin-bottom: 10px; }
+    .product .price { font-size: 1rem; font-weight: bold; color: #007bff; margin-top: auto; }
+    .product-buttons { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+    .buy-btn { background: #484848; color: #fff; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; }
+    .buy-btn:hover { background: #383838; }
+    .favorite-btn { font-size: 1.2rem; color: #ccc; background: none; cursor: pointer; }
+    .favorite-btn.active { color: red; }
+/* делаем общий flex-контейнер */
+.content-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* стили сайдбара */
+.sidebar {
+  flex: 0 0 250px;            /* фиксированная ширина колонки */
+  background: #fff;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  position: sticky;           /* «прилипает» при скролле */
+  top: 100px;                 /* отступ от верха при скролле */
+  height: fit-content;
+}
+
+/* внутри сайдбара секции фильтров разделяем */
+.sidebar .sort-controls,
+.sidebar .filter-controls,
+.sidebar .category-filter {
+  margin-bottom: 24px;
+}
+
+/* заголовок категорий */
+.sidebar .category-filter h3 {
+  margin-bottom: 12px;
+  font-size: 18px;
+  color: #333;
+}
+
+/* адаптив: на узких экранах делаем колонки под товарами */
+@media (max-width: 1200px) {
+      .product-list { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 992px) {
+      .content-container { flex-direction: column; }
+      .sidebar { position: relative; top: auto; width: 100%; margin-bottom: 20px; }
+      .product-list { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 576px) {
+      .product-list { grid-template-columns: 1fr; }
+    }
+.filter-controls input[type="checkbox"] {
+  accent-color: #007bff;
+  margin-right: 6px;
+}
+
+/* числовые поля и range-ползунки */
+.price-inputs input[type="number"] {
+  width: 80px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.filter-controls input[type="range"] {
+  width: 100%;
+  margin: 6px 0;
+}
+.content-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+   /* контейнер основной области */
+   .content-container {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    /* сайдбар слева */
+    .sidebar {
+      flex: 0 0 260px;
+      background: #fff;
+      padding: 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+    .sidebar .sort-controls,
+    .sidebar .filter-controls,
+    .sidebar .category-filter,
+    .sidebar .manufacturer-filter {
+      margin-bottom: 24px;
+    }
+    .sidebar h3 {
+      margin-bottom: 12px;
+      font-size: 18px;
+      color: #333;
+    }
+    /* товары справа */
+    .product-section {
+      flex: 1;
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .product-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    /* прочие ваши стили товаров остаются без изменений */
+    @media (max-width: 992px) {
+      .content-container {
+        flex-direction: column;
+      }
+   
+      .sidebar {
+        position: relative;
+        top: auto;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+    }
+/* Отступы между секциями в сайдбаре */
+.sidebar .sort-controls,
+.sidebar .filter-controls,
+.sidebar .category-filter,
+.sidebar .manufacturer-filter {
+  margin-bottom: 24px;
+}
+/* Заголовки в фильтрах */
+.sidebar h3 {
+  margin-bottom: 12px;
+  font-size: 18px;
+  color: #333;
+}
+/* Адаптив: на планшетах/мобилах переключаем на одну колонку */
+@media (max-width: 992px) {
+  .content-container {
+    flex-direction: column;
+  }
+  .sidebar {
+    position: relative;
+    top: auto;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
+@media (max-width: 1200px) { .product-list { grid-template-columns: repeat(3,1fr); } }
+    @media (max-width: 992px) 
+    { nav ul { flex-direction: column; align-items: stretch; } 
+    .menu-toggle { display: block; } 
+    .content-container { flex-direction: column; }
+     .sidebar { width: 100%; position: relative; top: 0; margin-bottom: 20px; } 
+     .product-list { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 576px) 
+    { .product-list { grid-template-columns: 1fr; } }
+footer {
+    background: linear-gradient(200deg, #333, #555);
+    color: #fff;
+    padding: 40px 20px;
+    font-family: Arial, sans-serif;
+  }
+  .footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .footer-section {
+    flex: 1 1 250px;
+    margin: 10px;
+  }
+  .footer-section.nav .footer-logo img {
+    max-height: 50px;
+    margin-bottom: 15px;
+  }
+  .footer-nav {
+    list-style: none;
+    padding: 0;
+  }
+  .footer-nav li {
+    margin: 5px 0;
+  }
+  .footer-nav a {
+    color: #fff;
+    text-decoration: none;
+    transition: color .3s;
+  }
+  .footer-nav a:hover {
+    color: #0af;
+  }
+  .footer-section h3 {
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    border-bottom: 2px solid #0af;
+    display: inline-block;
+    padding-bottom: 5px;
+  }
+  .footer-section a {
+    color: #0af;
+    text-decoration: none;
+  }
+  .footer-section a:hover {
+    text-decoration: underline;
+  }
+  .social-icons {
+    margin-top: 10px;
+  }
+  .social-icons a {
+    margin-right: 10px;
+    display: inline-block;
+  }
+  .social-icons img {
+    width: 36px;
+    transition: transform .3s;
+  }
+  .social-icons img:hover {
+    transform: scale(1.1);
+  }
+  .footer-section.copyright {
+    align-self: flex-end;
+    text-align: right;
+  }
+  @media (max-width: 768px) {
+    .footer-container {
+      flex-direction: column;
+      text-align: center;
+    }
+    .footer-section {
+      margin: 15px 0;
+    }
+    .footer-nav li {
+      display: inline-block;
+      margin: 0 10px;
+    }
+  }
+   /* Тост уведомления */
+   #toast-container {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10000;
+    }
+    .toast {
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 4px;
+      margin-top: 10px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Верхнее меню -->
+  <header>
+    <div class="container">
+      <nav>
+        <ul>
+          <div class="logo">
+            <a href="index.html" class="logo">
+              <img src="img/logo.png" alt="Логотип" />
+            </a>
+          </div>
+          <li><a href="kataloh.html">Каталог</a></li>
+          <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Поиск..." />
+            <div class="search-results" id="searchResults"></div>
+          </div>
+          <li><a href="korzina.html">Корзина (<span id="cart-count">0</span>)</a></li>
+          <li><a href="lich.html">Личный Кабинет</a></li>
+        </ul>
+      </nav>
+
+    </div>
+  </header>
+
+  <main>
+    
+      <div class="content-container">
+        <!-- Левая колонка: сортировка + фильтры -->
+        <aside class="sidebar">
+          <div class="sort-controls">
+            <label for="sort">Сортировка по цене:</label>
+            <select id="sort">
+              <option value="asc">От дешевых к дорогим</option>
+              <option value="desc">От дорогих к дешевым</option>
+            </select>
+          </div>
+          <div class="filter-controls">
+            <div class="price-filter">
+              <label>Цена, ₽:</label>
+              <div class="price-inputs">
+                <input type="number" id="priceMin" value="0" min="0" max="150000"> –
+                <input type="number" id="priceMax" value="150000" min="0" max="150000">
+              </div>
+              <input type="range" id="priceRangeMin" min="0" max="150000" step="1000" value="0">
+              <input type="range" id="priceRangeMax" min="0" max="150000" step="1000" value="0">
+            </div>
+            <div class="category-filter">
+              <h3>Категории</h3>
+              <label><input type="checkbox" class="cat-chk" value="игровые приставки" checked> Игровые приставки</label>
+              <label><input type="checkbox" class="cat-chk" value="компьютеры" checked> Компьютеры/периферия</label>
+              <label><input type="checkbox" class="cat-chk" value="пылесос" checked> Пылесосы</label>
+              <label><input type="checkbox" class="cat-chk" value="электрочайник" checked> Электрочайники</label>
+              <label><input type="checkbox" class="cat-chk" value="телевизоры" checked> Телевизоры</label>
+              <label><input type="checkbox" class="cat-chk" value="посудомоечные машины" checked> Посудомоечные машины</label>
+              <label><input type="checkbox" class="cat-chk" value="холодильники" checked> Холодильники</label>
+              <label><input type="checkbox" class="cat-chk" value="колонки" checked> Колонки</label>
+              <label><input type="checkbox" class="cat-chk" value="наушники" checked> Наушники</label>
+              <label><input type="checkbox" class="cat-chk" value="Смартфон" checked> Смартфон</label>
+            </div>
+            <div class="manufacturer-filter">
+              <h3>Производители</h3>
+              <label><input type="checkbox" class="man-chk" value="Sony" checked> Sony</label>
+              <label><input type="checkbox" class="man-chk" value="Logitech" checked> Logitech</label>
+              <label><input type="checkbox" class="man-chk" value="Karcher" checked> Karcher</label>
+              <label><input type="checkbox" class="man-chk" value="VITEK" checked> VITEK</label>
+              <label><input type="checkbox" class="man-chk" value="Xiaomi" checked> Xiaomi</label>
+              <label><input type="checkbox" class="man-chk" value="Бирюса" checked> Бирюса</label>
+              <label><input type="checkbox" class="man-chk" value="MOREL" checked> MOREL</label>
+              <label><input type="checkbox" class="man-chk" value="Robotcomp" checked> Robotcomp</label>
+              <label><input type="checkbox" class="man-chk" value="Apple" checked> Apple</label>
+              <label><input type="checkbox" class="man-chk" value="JBL" checked> JBL</label>
+              <label><input type="checkbox" class="man-chk" value="Dexp" checked> Dexp</label>
+              <label><input type="checkbox" class="man-chk" value="Samsung" checked> Samsung</label>
+              <label><input type="checkbox" class="man-chk" value="Haier" checked> Haier</label>
+              <label><input type="checkbox" class="man-chk" value="msi" checked> msi</label>
+              <label><input type="checkbox" class="man-chk" value="nintendo" checked> nintendo</label>
+     
+            </div>
+          </div>
+        </aside>
+  
+      <!-- Секция товаров -->
+      <section class="product-section">
+        <div class="product-list" id="productList">
+          <!-- Пример товара 1 -->
+          <div class="product" id="product1" data-price="50000" data-category="игровые приставки" data-manufacturer="Sony">
+            <img src="img/10.png" alt="Товар 1">
+            <h2>Playstation 5</h2>
+            <p>825 ГБ, дисковод, Bluetooth 5.1, Wi-Fi 6, HDMI 2.1, 8K UltraHD</p>
+            <a href="tovar.html" class="price">Цена: 50000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product1', 'Playstation 5', 50000, 'img/10.png')">Купить</button>
+              <div id="favorite-product1" class="favorite-btn" onclick="toggleFavorite('product1', 'Playstation 5', 'img/10.png', 50000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 2 -->
+          <div class="product" data-price="8000" data-category="компьютеры" data-manufacturer="Logitech">
+            <img src="img/2.png" alt="Товар 2">
+            <h2>Беспроводная мышь Logitech</h2>
+            <p>Легкая и быстрая мышь для игр</p>
+            <a href="2.html" class="price">Цена: 8000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product2', 'Беспроводная мышь Logitech', 8000, 'img/2.png')">Купить</button>
+              <div id="favorite-product2" class="favorite-btn" onclick="toggleFavorite('product2', 'Беспроводная мышь Logitech', 'img/2.png', 8000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 3 -->
+          <div class="product" data-price="15000" data-category="пылесос" data-manufacturer="Karcher">
+            <img src="img/3.png" alt="Товар 3">
+            <h2>Пылесос Karcher</h2>
+            <p>Мощный и надежный пылесос</p><br><br>
+            <a href="3.html" class="price">Цена: 15000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product3', 'Пылесос Karcher', 15000, 'img/3.png')">Купить</button>
+              <div id="favorite-product3" class="favorite-btn" onclick="toggleFavorite('product3', 'Пылесос Karcher', 'img/3.png', 15000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 4 -->
+          <div class="product" data-price="4000" data-category="электрочайник" data-manufacturer="VITEK">
+            <img src="img/4.png" alt="Товар 4">
+            <h2>Электрочайник VITEK</h2>
+            <p>Быстрое закипячивание воды</p><br>
+            <a href="4.html" class="price">Цена: 4000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product4', 'Электрочайник VITEK', 4000, 'img/4.png')">Купить</button>
+              <div id="favorite-product4" class="favorite-btn" onclick="toggleFavorite('product4', 'Электрочайник VITEK', 'img/4.png', 4000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 5 -->
+          <div class="product" data-price="25000" data-category="телевизоры" data-manufacturer="Xiaomi">
+            <img src="img/5.png" alt="Товар 5">
+            <h2>Телевизор Xiaomi TV</h2>
+            <p>Ультра HD качество изображения</p>
+            <a href="5.html" class="price">Цена: 25000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product5', 'Телевизор Xiaomi TV', 25000, 'img/5.png')">Купить</button>
+              <div id="favorite-product5" class="favorite-btn" onclick="toggleFavorite('product5', 'Телевизор Xiaomi TV', 'img/5.png', 25000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 6 -->
+          <div class="product" data-price="10000" data-category="посудомоечные машины" data-manufacturer="Бирюса">
+            <img src="img/6.png" alt="Товар 6">
+            <h2>Посудомоечная машина Бирюса</h2>
+            <p>Эффективная мойка посуды</p>
+            <a href="6.html" class="price">Цена: 10000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product6', 'Посудомоечная машина Бирюса', 10000, 'img/6.png')">Купить</button>
+              <div id="favorite-product6" class="favorite-btn" onclick="toggleFavorite('product6', 'Посудомоечная машина Бирюса', 'img/6.png', 10000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 7 -->
+          <div class="product" data-price="20000" data-category="холодильники" data-manufacturer="Бирюса">
+            <img src="img/7.png" alt="Товар 7">
+            <h2>Холодильник Бирюса</h2>
+            <p>Современный дизайн, высокая энергоэффективность</p><br><br>
+            <a href="7.html" class="price">Цена: 20000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product7', 'Холодильник Бирюса', 20000, 'img/7.png')">Купить</button>
+              <div id="favorite-product7" class="favorite-btn" onclick="toggleFavorite('product7', 'Холодильник Бирюса', 'img/7.png', 20000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 8 -->
+          <div class="product" data-price="5000" data-category="колонки" data-manufacturer="MOREL">
+            <img src="img/9.png" alt="Товар 8">
+            <h2>Акустическая система MOREL</h2>
+            <p>Кристально чистый звук</p><br><br><br>
+            <a href="8.html" class="price">Цена: 5000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product8', 'Акустическая система MOREL', 5000, 'img/9.png')">Купить</button>
+              <div id="favorite-product8" class="favorite-btn" onclick="toggleFavorite('product8', 'Акустическая система MOREL', 'img/9.png', 5000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 9 -->
+          <div class="product" data-price="150000" data-category="компьютеры" data-manufacturer="Robotcomp" >
+            <img src="img/19.png" alt="Товар 9">
+            <h2>Robotcomp Посейдон</h2>
+            <p>Высокая производительность и стильный дизайн</p><br><br><br>
+            <a href="9.html" class="price">Цена: 150000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product9', 'Robotcomp Посейдон', 150000, 'img/19.png')">Купить</button>
+              <div id="favorite-product9" class="favorite-btn" onclick="toggleFavorite('product9', 'Robotcomp Посейдон', 'img/19.png', 150000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 10 -->
+          <div class="product" data-price="8000" data-category="наушники" data-manufacturer="Logitech">
+            <img src="img/12.png" alt="Товар 10">
+            <h2>Наушники Logitech G435</h2>
+            <p>Отличное качество звука и комфорта</p><br>
+            <a href="10.html" class="price">Цена: 8000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product10', 'Наушники Logitech G435', 8000, 'img/12.png')">Купить</button>
+              <div id="favorite-product10" class="favorite-btn" onclick="toggleFavorite('product10', 'Наушники Logitech G435', 'img/12.png', 8000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 11 -->
+          <div class="product" data-price="48000" data-category="Смартфон" data-manufacturer="Apple">
+            <img src="img/14.png" alt="Товар 11">
+            <h2>Apple iPhone 13</h2>
+            <p>Мощный и стильный смартфон</p><br><br>
+            <a href="11.html" class="price">Цена: 48000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product11', 'Apple iPhone 13', 48000, 'img/14.png')">Купить</button>
+              <div id="favorite-product11" class="favorite-btn" onclick="toggleFavorite('product11', 'Apple iPhone 13', 'img/14.png', 48000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 12 -->
+          <div class="product" data-price="52000" data-category="наушники" data-manufacturer="Apple">
+            <img src="img/18.png" alt="Товар 12">
+            <h2>Apple AirPods</h2>
+            <p>Идеальное сочетание стиля и качества</p>
+            <a href="12.html" class="price">Цена: 52000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product12', 'Apple AirPods', 52000, 'img/18.png')">Купить</button>
+              <div id="favorite-product12" class="favorite-btn" onclick="toggleFavorite('product12', 'Apple AirPods', 'img/18.png', 52000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 13 -->
+          <div class="product" data-price="28000" data-category="колонки" data-manufacturer="JBL">
+            <img src="img/22.png" width="200" alt="Товар 13">
+            <h2>JBL Boombox 3</h2>
+            <p>Мощный звук для больших компаний</p><br><br><br><br>
+            <a href="13.html" class="price">Цена: 28000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product13', 'JBL Boombox 3', 28000, 'img/22.png')">Купить</button>
+              <div id="favorite-product13" class="favorite-btn" onclick="toggleFavorite('product13', 'JBL Boombox 3', 'img/22.png', 28000)">&#9825;</div>
+            </div>
+          </div>
+          <!-- Пример товара 14 -->
+          <div class="product" data-price="131000" data-category="Смартфон" data-manufacturer="Apple">
+            <img src="img/21.jpg" alt="Товар 14">
+            <h2>Apple iPhone 15 Pro Max</h2>
+            <p>Премиум качество и инновационные технологии</p><br><br><br>
+            <a href="14.html" class="price">Цена: 131000 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product14', 'Apple iPhone 15 Pro Max', 131000, 'img/21.png')">Купить</button>
+              <div id="favorite-product14" class="favorite-btn" onclick="toggleFavorite('product14', 'Apple iPhone 15 Pro Max', 'img/21.png', 131000)">&#9825;</div>
+            </div>
+          </div>
+            <!-- Пример товара 15 -->
+            <div class="product" data-price="1200" data-category="компьютеры" data-manufacturer="Dexp">
+            <img src="img/3333.png" alt="Товар 15">
+            <h2>DEXP Armor</h2>
+            <p>7200 dpi, светодиодный, USB Type-A, кнопки - 8</p><br><br><br>
+            <a href="15.html" class="price">Цена: 1200 ₽</a>
+            <div class="product-buttons">
+              <button class="buy-btn" onclick="addToCart('product15', 'DEXP Armor', 1200, 'img/3333.png')">Купить</button>
+              <div id="favorite-product15" class="favorite-btn" onclick="toggleFavorite('product15', 'DEXP Armor', 'img/3333.png', 1200)">&#9825;</div>
+            </div>
+          </div>
+            <!-- Пример товара 16 -->
+            <div class="product" data-price="18999" data-category="Смартфон" data-manufacturer="Xiaomi">
+              <img src="img/7128533313.jpg" alt="Товар 16">
+              <h2>Xiaomi Redmi Note 13 </h2>
+              <p>ядер - 8x(2.8 ГГц), 8 ГБ, 2 SIM, AMOLED, 2400x1080, камера 108+8+2 Мп, NFC, 4G, GPS, FM, 5000 мА*ч</p><br><br><br>
+              <a href="16.html" class="price">Цена: 18999 ₽</a>
+              <div class="product-buttons">
+                <button class="buy-btn" onclick="addToCart('product16', 'Xiaomi Redmi Note 13', 1899, 'img/7128533313.jpg')">Купить</button>
+                <div id="favorite-product16" class="favorite-btn" onclick="toggleFavorite('product16', 'Xiaomi Redmi Note 13', 'img/7128533313.jpg', 18999)">&#9825;</div>
+              </div>
+            </div>
+             <!-- Пример товара 17 -->
+             <div class="product" data-price="34999" data-category="телевизоры" data-manufacturer="Samsung">
+              <img src="img/7154880650.png" alt="Товар 17">
+              <h2>Samsung UE43DU8000UXRU </h2>
+              <p>Edge LED, 4K UltraHD, Wi-Fi, 60 Гц, Tizen, HDMI х 3, USB х 2 шт</p><br><br><br>
+              <a href="17.html" class="price">Цена: 34999 ₽</a>
+              <div class="product-buttons">
+                <button class="buy-btn" onclick="addToCart('product17', 'Samsung UE43DU8000UXRU', 34999, 'img/7154880650.png')">Купить</button>
+                <div id="favorite-product17" class="favorite-btn" onclick="toggleFavorite('product17', 'Samsung UE43DU8000UXRU', 'img/7154880650.png', 34999)">&#9825;</div>
+              </div>
+            </div>
+            <!-- Пример товара 18 -->
+            <div class="product" data-price="39999" data-category="холодильники" data-manufacturer="Haier">
+              <img src="img/7.png" alt="Товар 18">
+              <h2>Haier C2F636CRRG  </h2>
+              <p>364 л, внешнее покрытие-металл, размораживание - No Frost</p><br><br><br>
+              <a href="18.html" class="price">Цена: 39999 ₽</a>
+              <div class="product-buttons">
+                <button class="buy-btn" onclick="addToCart('product18', 'Haier C2F636CRRG', 34999, 'img/7.png')">Купить</button>
+                <div id="favorite-product18" class="favorite-btn" onclick="toggleFavorite('product18', 'Haier C2F636CRRG', 'img/7.png', 39999)">&#9825;</div>
+              </div>
+            </div>
+              <!-- Пример товара 19 -->
+              <div class="product" data-price="397999" data-category="компьютеры" data-manufacturer="msi">
+                <img src="img/600.png" alt="Товар 19">
+                <h2>MSI MEG Vision X AI 2NVV9-028XRU  </h2>
+                <p>Intel Core Ultra 9 285K, 8 x 3.7 ГГц, 64 ГБ DDR5, GeForce RTX 5080, SSD 1000 ГБ,</p><br><br><br>
+                <a href="19.html" class="price">Цена: 397999 ₽</a>
+                <div class="product-buttons">
+                  <button class="buy-btn" onclick="addToCart('product19', 'MSI MEG Vision X AI 2NVV9-028XRU', 397999, 'img/600.png')">Купить</button>
+                  <div id="favorite-product19" class="favorite-btn" onclick="toggleFavorite('product19', 'MSI MEG Vision X AI 2NVV9-028XRU', 'img/600.png', 397999)">&#9825;</div>
+                </div>
+              </div>
+                 <!-- Пример товара 20 -->
+                 <div class="product" data-price="59999" data-category="игровые приставки" data-manufacturer="nintendo">
+                  <img src="img/6078941981.png" alt="Товар 20">
+                  <h2>Nintendo Switch 2  </h2>
+                  <p>256 ГБ, экран 7.9", IPS, 1920x1080, Wi-Fi 6 (802.11ax)</p><br><br><br>
+                  <a href="20.html" class="price">Цена: 59999 ₽</a>
+                  <div class="product-buttons">
+                    <button class="buy-btn" onclick="addToCart('product20', 'Nintendo Switch 2 ', 59999, 'img/6078941981.png')">Купить</button>
+                    <div id="favorite-product20" class="favorite-btn" onclick="toggleFavorite('product20', 'Nintendo Switch 2 ', 'img/6078941981.png', 59999)">&#9825;</div>
+                  </div>
+                </div>
+        </div>
+      </div>
+    </div>
+      </section>
+
+    <script>
+     document.addEventListener('DOMContentLoaded', () => {
+    const categoryCheckboxes = document.querySelectorAll('.cat-chk');
+    const manufacturerCheckboxes = document.querySelectorAll('.man-chk');
+    const sortSelect = document.getElementById('sort');
+    const productList = document.getElementById('productList');
+    const products = Array.from(productList.querySelectorAll('.product'));
+
+    // Повторно отрисовать список: сначала фильтруем, потом сортируем, потом выводим
+    function updateProducts() {
+      // 1. Собираем выбранные категории и производителей
+      const selectedCats = Array.from(categoryCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+      const selectedMans = Array.from(manufacturerCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+
+      // 2. Фильтрация
+      let filtered = products.filter(prod => {
+        const cat = prod.dataset.category;
+        const man = prod.dataset.manufacturer;
+        // показываем, если категория и производитель разрешены
+        return selectedCats.includes(cat) && selectedMans.includes(man);
+      });
+
+      // 3. Сортировка по цене
+      const direction = sortSelect.value; // 'asc' или 'desc'
+      filtered.sort((a, b) => {
+        const pa = +a.dataset.price;
+        const pb = +b.dataset.price;
+        return direction === 'asc' ? pa - pb : pb - pa;
+      });
+
+      // 4. Очищаем контейнер и заново вставляем отфильтрованные в нужном порядке
+      productList.innerHTML = '';
+      filtered.forEach(prod => productList.appendChild(prod));
+    }
+
+    // Повесим обновление при изменении любого чекбокса или селекта
+    categoryCheckboxes.forEach(cb => cb.addEventListener('change', updateProducts));
+    manufacturerCheckboxes.forEach(cb => cb.addEventListener('change', updateProducts));
+    sortSelect.addEventListener('change', updateProducts);
+
+    // Инициализация при загрузке страницы
+    updateProducts();
+  });
+
+         // Функция добавления товара в корзину
+         function addToCart(id, name, price, image) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart.push({ id, name, price, image });
+        localStorage.setItem('cart', JSON.stringify(cart));
+        alert("Товар добавлен в корзину!");
+      }
+
+      // Функция переключения состояния избранного и добавления товара в localStorage
+      function toggleFavorite(id, name, image, price) {
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        // Получаем элемент-сердечко по id (используем обратные кавычки)
+        const favoriteElement = document.getElementById(`favorite-${id}`);
+        const index = favorites.findIndex(item => item.id === id);
+        if (index !== -1) {
+          // Если товар уже добавлен – удаляем его
+          favorites.splice(index, 1);
+          favoriteElement.classList.remove('active');
+          alert("Товар удалён из избранного!");
+        } else {
+          // Добавляем товар с полными данными
+          favorites.push({ id, name, image, price });
+          favoriteElement.classList.add('active');
+          alert("Товар добавлен в избранное!");
+        }
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+      }
+
+          // Сортировка товаров по цене
+    document.getElementById('sort').addEventListener('change', function() {
+      const sortValue = this.value;
+      const productList = document.getElementById('productList');
+      const products = Array.from(productList.children);
+      products.sort((a, b) => {
+        const priceA = +a.dataset.price;
+        const priceB = +b.dataset.price;
+        return sortValue === 'asc' ? priceA - priceB : priceB - priceA;
+      });
+      products.forEach(p => productList.appendChild(p));
+    });
+      // получаем элементы
+const priceMinN = document.getElementById('priceMin'),
+      priceMaxN = document.getElementById('priceMax'),
+      priceMinR = document.getElementById('priceRangeMin'),
+      priceMaxR = document.getElementById('priceRangeMax'),
+      catChks    = Array.from(document.querySelectorAll('.cat-chk')),
+      manChks    = Array.from(document.querySelectorAll('.man-chk')),
+      products   = Array.from(document.querySelectorAll('.product'));
+
+// синхронизируем number <> range
+function syncPrices() {
+  let min = parseInt(priceMinN.value), max = parseInt(priceMaxN.value);
+  if(min>max) min = max, priceMinN.value = min;
+  priceMinR.value = min;
+  priceMaxR.value = max;
+}
+priceMinN.addEventListener('input', syncPrices);
+priceMaxN.addEventListener('input', syncPrices);
+priceMinR.addEventListener('input', ()=>{ priceMinN.value = priceMinR.value; filterAll(); });
+priceMaxR.addEventListener('input', ()=>{ priceMaxN.value = priceMaxR.value; filterAll(); });
+ 
+// общая функция фильтрации
+function filterAll() {
+  const min = parseInt(priceMinN.value),
+        max = parseInt(priceMaxN.value),
+        cats = catChks.filter(c=>c.checked).map(c=>c.value),
+        mans = manChks.filter(m=>m.checked).map(m=>m.value);
+
+  products.forEach(p => {
+    const price = +p.dataset.price,
+          cat   = p.dataset.category,
+          man   = p.dataset.manufacturer;
+    const okPrice = price>=min && price<=max;
+    const okCat   = cats.includes(cat);
+    const okMan   = mans.includes(man);
+    p.style.display = (okPrice && okCat && okMan) ? '' : 'none';
+  });
+}
+
+// вешаем слушатели на чекбоксы
+[...catChks, ...manChks].forEach(chk => chk.addEventListener('change', filterAll));
+
+     
+
+   // Обновление счётчика в шапке
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  // суммируем все quantity
+  const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  document.getElementById('cart-count').textContent = totalCount;
+}
+
+// Добавление в корзину без дублирования
+function addToCart(id, name, price, image) {
+  // получаем текущую корзину
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  // ищем товар по id
+  const existing = cart.find(item => item.id === id);
+  if (existing) {
+    // увеличиваем количество
+    existing.quantity += 1;
+  } else {
+    // добавляем новый объект с quantity = 1
+    cart.push({ id, name, price, image, quantity: 1 });
+  }
+  // сохраняем и обновляем счётчик
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+  alert('Товар добавлен в корзину!');
+}
+
+// При загрузке страницы показываем актуальный счётчик
+document.addEventListener('DOMContentLoaded', () => {
+  updateCartCount();
+});
+
+    // Инициализация при загрузке
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartCount();
+    });
+
+      // Функция переключения состояния избранного и добавления товара в localStorage
+      function toggleFavorite(id, name, image, price) {
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        // Получаем элемент-сердечко по id (используем обратные кавычки)
+        const favoriteElement = document.getElementById(`favorite-${id}`);
+        const index = favorites.findIndex(item => item.id === id);
+        if (index !== -1) {
+          // Если товар уже добавлен – удаляем его
+          favorites.splice(index, 1);
+          favoriteElement.classList.remove('active');
+          alert("Товар удалён из избранного!");
+        } else {
+          // Добавляем товар с полными данными
+          favorites.push({ id, name, image, price });
+          favoriteElement.classList.add('active');
+          alert("Товар добавлен в избранное!");
+        }
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+      }
+
+      // Сортировка товаров по цене
+      document.getElementById('sort').addEventListener('change', function() {
+        let sortValue = this.value;
+        let productList = document.getElementById('productList');
+        let products = Array.from(productList.getElementsByClassName('product'));
+        products.sort(function(a, b) {
+          let priceA = parseInt(a.getAttribute('data-price'));
+          let priceB = parseInt(b.getAttribute('data-price'));
+          return sortValue === 'asc' ? priceA - priceB : priceB - priceA;
+        });
+        productList.innerHTML = '';
+        products.forEach(function(product) {
+          productList.appendChild(product);
+        });
+      });
+
+      // Фильтрация товаров по категории
+      function filterCategory(category) {
+        let products = document.querySelectorAll('.product');
+        products.forEach(function(product) {
+          if (category === 'all') {
+            product.style.display = 'block';
+          } else {
+            product.style.display = product.getAttribute('data-category') === category ? 'block' : 'none';
+          }
+        });
+      }
+
+
+
+    
+    </script>
+  </main>
+
+ 
+  <script src="script.js"></script>
+  
+  <footer>
+    <div class="footer-container">
+      <!-- Лого и навигация -->
+      <div class="footer-section nav">
+        <a href="index.html" class="footer-logo">
+          <img src="img/logo.png" alt="Логотип" />
+        </a>
+        <ul class="footer-nav">
+          <li><a href="index.html">Главная</a></li>
+          <li><a href="about.html">О нас</a></li>
+          <li><a href="contacts.html">Контакты</a></li>
+        </ul>
+      </div>
+  
+      <!-- Контактная информация -->
+      <div class="footer-section contact">
+        <h3>Контактная информация</h3>
+        <p>Телефон: <a href="tel:+73917594242">+7 (391) 759‑42‑42</a></p>
+        <p>Email: <a href="mailto:barhatovo@mail.ru">barhatovo@mail.ru</a></p>
+      </div>
+  
+      <!-- Социальные сети -->
+      <div class="footer-section social">
+        <h3>Следите за нами</h3>
+        <div class="social-icons">
+          <a href="https://web.telegram.org/" target="_blank">
+            <img src="img/1683044996telegram-logo-png.png" alt="tg">
+          </a>
+          <a href="https://vk.com/" target="_blank">
+            <img src="img/pngwing.com.png" alt="Vk">
+          </a>
+        </div>
+      </div>
+  
+      <!-- Копирайт -->
+      <div class="footer-section copyright">
+        <p>&copy; © 2025 ТехноМания. Все права защищены.</p>
+      </div>
+    </div>
+    
+  </footer>
+
+
+</body>
+</html>

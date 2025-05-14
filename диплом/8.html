@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ТехноМания</title>
+  <!-- Подключение таблицы стилей -->
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Стили для слайдера */
+    .slider {
+      position: relative;
+      max-width: 500px;
+      margin: 20px auto;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+    .slides {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+    .slide {
+      min-width: 100%;
+      box-sizing: border-box;
+    }
+    .slide img {
+      width: 100%;
+      display: block;
+    }
+    /* Кнопки навигации слайдера */
+    .slider-controls {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
+    }
+    .prev, .next {
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      padding: 10px;
+      border-radius: 50%;
+      user-select: none;
+      margin: 0 10px;
+    }
+    /* Стили для спецификаций товара */
+    .product-specs {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-family: Arial, sans-serif;
+    }
+    .product-specs .group-header th {
+      text-align: left;
+      font-size: 1.1em;
+      padding: 8px 0;
+      border-top: 2px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      color: #333;
+    }
+    .product-specs td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: top;
+      color: #555;
+    }
+    .product-specs td:first-child {
+      width: 50%;
+      color: #777;
+    }
+    .product-specs td:last-child {
+      width: 50%;
+    }
+
+    /* Пример базовых стилей для карточки товара */
+    .product-card {
+      margin: 300px auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+    .product-description {
+      flex: 1;
+    }
+    .product-title {
+      margin-top: 0;
+    }
+    .add-to-cart {
+      background-color: #28a745;
+      border: none;
+      padding: 10px 20px;
+      color: #fff;
+      font-size: 1em;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .add-to-cart:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <ul>
+          <li class="logo">
+            <a href="index.html">
+              <img src="img/logo.png" alt="Логотип">
+            </a>
+          </li>
+          <li><a href="kataloh.html">Каталог</a></li>
+          <li>
+            <div class="search-bar">
+              <input type="text" placeholder="Поиск...">
+            </div>
+          </li>
+          <li><a href="korzina.html">Корзина</a></li>
+          <li><a href="lich.html">Личный кабинет</a></li>
+        </ul>
+      </nav>
+      <div class="menu-toggle" id="mobile-menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </header>
+
+  <main>
+    <br><br><br><br><br><br><br><br><br><br>
+    <div class="product-card">
+      <!-- Слайдер с 3 изображениями товара -->
+      <div class="slider" id="productSlider">
+        <div class="slides">
+          <div class="slide">
+            <img src="img/9.png" alt="Фото товара 1">
+          </div>
+          <div class="slide">
+            <img src="img/9.png" alt="Фото товара 2">
+          </div>
+          <div class="slide">
+            <img src="img/9.png" alt="Фото товара 3">
+          </div>
+        </div>
+        <div class="slider-controls">
+          <span class="prev" onclick="prevSlide()">&#10094;</span>
+          <span class="next" onclick="nextSlide()">&#10095;</span>
+        </div>
+      </div>
+      
+      <div class="product-description">
+        <h2 class="product-title">Компонентная акустика Morel Hybrid Integra 602  </h2>
+
+        <!-- Новая таблица характеристик -->
+        <table class="product-specs">
+          <tr class="group-header">
+            <th colspan="2">Общие характеристики</th>
+          </tr>
+          <tr>
+            <td>Тип</td>
+            <td>Компонентная акустика</td>
+          </tr>
+          <tr>
+            <td>Формат</td>
+            <td>2-полосная</td>
+          </tr>
+          <tr>
+            <td>Установка</td>
+            <td>Фронтальная</td>
+          </tr>
+          <tr>
+            <td>Сопротивление</td>
+            <td>4 Ом</td>
+          </tr>
+          <tr>
+            <td>Чувствительность</td>
+            <td>90 дБ</td>
+          </tr>
+        
+          <tr class="group-header">
+            <th colspan="2">Акустические характеристики</th>
+          </tr>
+          <tr>
+            <td>Диапазон воспроизводимых частот</td>
+            <td>35 – 25000 Гц</td>
+          </tr>
+          <tr>
+            <td>Максимальная мощность</td>
+            <td>200 Вт</td>
+          </tr>
+          <tr>
+            <td>Номинальная мощность</td>
+            <td>120 Вт</td>
+          </tr>
+          <tr>
+            <td>Размер динамиков</td>
+            <td>6.5 дюйма (16.5 см)</td>
+          </tr>
+        
+          <tr class="group-header">
+            <th colspan="2">Особенности</th>
+          </tr>
+          <tr>
+            <td>Тип твитеров</td>
+            <td>Шелковый купольный</td>
+          </tr>
+          <tr>
+            <td>Монтажная глубина</td>
+            <td>62 мм</td>
+          </tr>
+          <tr>
+            <td>Материал диффузора</td>
+            <td>Целлюлоза с покрытием</td>
+          </tr>
+        
+          <tr class="group-header">
+            <th colspan="2">Дополнительно</th>
+          </tr>
+          <tr>
+            <td>Кроссовер в комплекте</td>
+            <td>Да</td>
+          </tr>
+          <tr>
+            <td>Страна производства</td>
+            <td>Израиль</td>
+          </tr>
+          <tr>
+            <td>Особенности</td>
+            <td>Интегрированная конструкция твитера и мидбаса (Integra)</td>
+          </tr>
+        </table>
+
+        <p class="product-price">Цена: 5000 руб.</p>
+        <button class="add-to-cart" onclick="addToCart()">Добавить в корзину</button>
+      </div>
+    </div>
+  </main>
+  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>   <br>  <br>  <br>  <br>  <br>  <br>  <br> <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>
+  <footer>
+    <div class="footer-container">
+      <!-- Лого и навигация -->
+      <div class="footer-section nav">
+        <a href="index.html" class="footer-logo">
+          <img src="img/logo.png" alt="Логотип" />
+        </a>
+        <ul class="footer-nav">
+          <li><a href="index.html">Главная</a></li>
+          <li><a href="about.html">О нас</a></li>
+          <li><a href="contacts.html">Контакты</a></li>
+        </ul>
+      </div>
+
+      <!-- Контактная информация -->
+      <div class="footer-section contact">
+        <h3>Контактная информация</h3>
+        <p>Телефон: <a href="tel:+73917594242">+7 (391) 759‑42‑42</a></p>
+        <p>Email: <a href="mailto:barhatovo@mail.ru">barhatovo@mail.ru</a></p>
+      </div>
+
+      <!-- Социальные сети -->
+      <div class="footer-section social">
+        <h3>Следите за нами</h3>
+        <div class="social-icons">
+          <a href="https://web.telegram.org/" target="_blank">
+            <img src="img/1683044996telegram-logo-png.png" alt="tg">
+          </a>
+          <a href="https://vk.com/" target="_blank">
+            <img src="img/pngwing.com.png" alt="Vk">
+          </a>
+        </div>
+      </div>
+
+      <!-- Копирайт -->
+      <div class="footer-section copyright">
+        <p>&copy; © 2025 ТехноМания. Все права защищены.</p>
+      </div>
+    </div>
+  </footer>
+  <!-- ========== /НОВЫЙ ФУТЕР ========== -->
+
+  <style>
+    /* FOOTER */
+    footer {
+      background: linear-gradient(200deg, #333, #555);
+      color: #fff;
+      padding: 40px 20px;
+      font-family: Arial, sans-serif;
+    }
+    .footer-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-section {
+      flex: 1 1 250px;
+      margin: 10px;
+    }
+    .footer-section.nav .footer-logo img {
+      max-height: 50px;
+      margin-bottom: 15px;
+    }
+    .footer-nav {
+      list-style: none;
+      padding: 0;
+    }
+    .footer-nav li {
+      margin: 5px 0;
+    }
+    .footer-nav a {
+      color: #fff;
+      text-decoration: none;
+      transition: color .3s;
+    }
+    .footer-nav a:hover {
+      color: #0af;
+    }
+    .footer-section h3 {
+      margin-bottom: 15px;
+      font-size: 1.2em;
+      border-bottom: 2px solid #0af;
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+    .footer-section a {
+      color: #0af;
+      text-decoration: none;
+    }
+    .footer-section a:hover {
+      text-decoration: underline;
+    }
+    .social-icons {
+      margin-top: 10px;
+    }
+    .social-icons a {
+      margin-right: 10px;
+      display: inline-block;
+    }
+    .social-icons img {
+      width: 36px;
+      transition: transform .3s;
+    }
+    .social-icons img:hover {
+      transform: scale(1.1);
+    }
+    .footer-section.copyright {
+      align-self: flex-end;
+      text-align: right;
+    }
+    @media (max-width: 768px) {
+      .footer-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-section {
+        margin: 15px 0;
+      }
+      .footer-nav li {
+        display: inline-block;
+        margin: 0 10px;
+      }
+    }
+  </style>
+
+  
+  <script>
+    // Логика слайдера
+    let slideIndex = 0;
+    const slidesContainer = document.querySelector('.slides');
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+      if (index >= totalSlides) {
+        slideIndex = 0;
+      } else if (index < 0) {
+        slideIndex = totalSlides - 1;
+      } else {
+        slideIndex = index;
+      }
+      slidesContainer.style.transform = 'translateX(' + (-slideIndex * 100) + '%)';
+    }
+
+    function nextSlide() {
+      showSlide(slideIndex + 1);
+    }
+
+    function prevSlide() {
+      showSlide(slideIndex - 1);
+    }
+    
+    // Функция добавления товара в корзину
+    function addToCart() {
+      // Здесь можно реализовать отправку данных на сервер или сохранение в localStorage
+      alert("Товар добавлен в корзину!");
+    }
+    
+    // При желании можно добавить автопереключение слайдов:
+    // setInterval(nextSlide, 5000);
+  </script>
+</body>
+</html>
