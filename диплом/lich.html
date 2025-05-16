@@ -206,6 +206,16 @@
         width: 100%;
       }
     }
+     /* Раздел «Заказы» */
+    .orders-list { margin-top: 20px; }
+    .order-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; transition: transform 0.2s; }
+    .order-card:hover { transform: translateY(-2px); }
+    .order-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .order-card-header h4 { margin: 0; font-size: 18px; }
+    .order-status { padding: 4px 8px; background: #fffae5; color: #b58900; border-radius: 12px; font-size: 12px; font-weight: bold; }
+    .order-items { list-style: none; padding: 0; margin: 0 0 10px; }
+    .order-items li { margin-bottom: 6px; font-size: 14px; color: #333; }
+    .order-total { font-weight: bold; font-size: 16px; text-align: right; }
    
   </style>
 </head>
@@ -304,9 +314,11 @@
         <ul>
           <li><a href="#profile" class="active" onclick="showSection('profile')">Профиль</a></li>
           <li><a href="#favorites" onclick="showSection('favorites')">Избранное</a></li>
+                    <li><a href="#orders" onclick="showSection('orders')">Заказы</a></li>
           <!-- Дополнительные пункты можно добавить здесь -->
         </ul>
       </aside>
+      
       <!-- Основное содержимое кабинета -->
       <main class="cabinet-content">
         <!-- Секция "Профиль" -->
@@ -357,9 +369,14 @@
         <section id="favorites" class="section" style="display: none;">
           <h2>Избранное</h2>
           <div class="favorites-grid" id="favorites-list">
+            
             <br><br>  <br><br>  <br><br>  <br><br>
             <!-- Динамически добавляемые избранные товары -->
           </div>
+        </section>
+         <section id="orders" class="section" style="display:none;">
+          <h2>Заказы</h2>
+          <div class="orders-list" id="orders-list"><p>У вас пока нет заказов.</p></div>
         </section>
         
       </main>
@@ -547,6 +564,71 @@
         showCabinetFromLocalStorage();
       }
     });
+        // Вспомогательные функции
+    function updateCartCount() { const cart=JSON.parse(localStorage.getItem('cart'))||[]; document.getElementById('cart-count').textContent=cart.length; }
+    // Отображение заказов
+    function showOrders() {
+      const orders=JSON.parse(localStorage.getItem('orders'))||[];
+      const list=document.getElementById('orders-list'); list.innerHTML='';
+      if(!orders.length){ list.innerHTML='<p>У вас пока нет заказов.</p>'; return; }
+      orders.slice().reverse().forEach(o=>{
+        const card=document.createElement('div'); card.className='order-card';
+        card.innerHTML=`<h4>Заказ #${o.id} — ${o.date}</h4>`;
+        const ul=document.createElement('ul'); ul.className='order-items';
+        o.items.forEach(i=>{ const li=document.createElement('li'); li.textContent=`${i.name} × ${i.quantity} — ${ (i.price*i.quantity).toFixed(2) } руб.`; ul.appendChild(li); });
+        const tot=document.createElement('p'); tot.innerHTML=`<strong>Итого: ${o.total.toFixed(2)} руб.</strong>`;
+        card.appendChild(ul); card.appendChild(tot); list.appendChild(card);
+      });
+    }
+    // Переключение вкладок кабинета
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s=>s.style.display=s.id===id?'block':'none');
+      document.querySelectorAll('.cabinet-sidebar a').forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+id));
+      if(id==='favorites') showFavorites();
+      if(id==='orders') showOrders();
+    }
+    // Сохранение заказа (вызывается на странице оформления)
+    function saveOrder(cart) {
+      const orders=JSON.parse(localStorage.getItem('orders'))||[];
+      const order={ id:Date.now(), date:new Date().toLocaleString('ru-RU'), items:cart, total:cart.reduce((s,i)=>s+i.price*i.quantity,0) };
+      orders.push(order); localStorage.setItem('orders',JSON.stringify(orders));
+    }
+    // Инициализация
+document.addEventListener('DOMContentLoaded',()=>{
+  updateCartCount();
+  if(localStorage.getItem('userData')) showCabinetFromLocalStorage();
+  // Сохранение через кнопку (по старому)
+  const btn=document.getElementById('checkoutBtn');
+  if(btn){
+    btn.addEventListener('click',()=>{
+      const cart=JSON.parse(localStorage.getItem('cart'))||[]; saveOrder(cart); localStorage.removeItem('cart'); alert('Заказ оформлен!');
+    });
+  }
+  // Обработка формы оформления, если присутствует на странице
+  const checkoutForm = document.getElementById('checkoutForm');
+  if(checkoutForm) {
+    checkoutForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      saveOrder(cart);
+      localStorage.removeItem('cart');
+      alert('Ваш заказ оформлен! Перейдите в личный кабинет, чтобы увидеть его.');
+      window.location.href = 'lich.html';
+    });
+  }
+});
+document.getElementById('logout').addEventListener('click', function() {
+  // Удаляем данные пользователя, избранное и заказы
+  localStorage.removeItem('userData');
+  localStorage.removeItem('favorites');
+  localStorage.removeItem('orders');
+  // Скрываем кабинет и показываем форму авторизации
+  document.getElementById('cabinet').style.display = 'none';
+  document.getElementById('auth-container').style.display = 'block';
+  // Очистка UI списков
+  document.getElementById('favorites-list').innerHTML = '';
+  document.getElementById('orders-list').innerHTML = '<p>У вас пока нет заказов.</p>';
+});
   </script>
   
   <!-- Подвал остается без изменений -->
